@@ -1,0 +1,41 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/main_drawerlayout"
+    tools:context=".MainActivity">
+
+    <uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+        android:id="@+id/main_refreshlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <ListView
+            android:id="@+id/main_timeline_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#ffeeeeee"
+            android:dividerHeight="0dp"
+            android:divider="@null"
+            android:listSelector="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:scrollbarStyle="insideOverlay"
+            android:overScrollMode="never"
+            />
+
+    </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
+
+    <ListView
+        android:id="@+id/main_left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:overScrollMode="never"
+        android:choiceMode="singleChoice"
+        android:divider="#ff242424"
+        android:dividerHeight="1dp"
+        android:background="#111"
+        />
+
+</android.support.v4.widget.DrawerLayout>

@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/account_manage_action_add"
+          android:icon="@drawable/ic_add"
+          android:showAsAction="ifRoom"
+            />
+
+</menu>

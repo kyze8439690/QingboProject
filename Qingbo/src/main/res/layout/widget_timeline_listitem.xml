@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:paddingBottom="10dp"
+                android:background="@drawable/card_background"
+    >
+
+    <com.yugy.qingbo.widget.RoundedImageView
+        android:id="@+id/timeline_listitem_head"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_launcher"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_toRightOf="@id/timeline_listitem_head"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#CCC"
+        android:textSize="12sp"
+        android:layout_toRightOf="@id/timeline_listitem_head"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_alignBottom="@id/timeline_listitem_head"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeline_listitem_head"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        />
+    
+    <TextView
+        android:id="@+id/timeline_listitem_topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#222"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/timeline_listitem_topic_bg"
+        android:visibility="invisible"
+        />
+
+    <View
+        android:id="@+id/timeline_listitem_repost_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#CCC"
+        android:layout_below="@id/timeline_listitem_text"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_repost_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeline_listitem_repost_divider"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_repost_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeline_listitem_repost_name"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"
+        />
+
+    <ImageView
+        android:id="@+id/timeline_listitem_pic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="80dp"
+        android:minHeight="80dp"
+        android:background="#CCC"
+        android:layout_below="@id/timeline_listitem_repost_text"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_commentcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/timeline_listitem_pic"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="1"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:padding="6dp"
+        android:drawableLeft="@drawable/timeline_listitem_comment_icon"
+        android:drawablePadding="3dp"
+        android:background="@drawable/timeline_listitem_button_background"
+        />
+
+    <TextView
+        android:id="@+id/timeline_listitem_repostcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/timeline_listitem_commentcount"
+        android:layout_below="@id/timeline_listitem_pic"
+        android:layout_marginTop="10dp"
+        android:text="1"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:padding="6dp"
+        android:drawableLeft="@drawable/timeline_listitem_repost_icon"
+        android:drawablePadding="3dp"
+        android:background="@drawable/timeline_listitem_button_background"
+        />
+
+</RelativeLayout>
