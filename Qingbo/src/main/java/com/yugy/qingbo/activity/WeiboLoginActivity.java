@@ -10,12 +10,12 @@ import android.webkit.WebViewClient;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.umeng.analytics.MobclickAgent;
 import com.yugy.qingbo.R;
 import com.yugy.qingbo.func.Func;
 import com.yugy.qingbo.sdk.Weibo;
 import com.yugy.qingbo.storage.Conf;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class WeiboLoginActivity extends Activity {
@@ -26,6 +26,18 @@ public class WeiboLoginActivity extends Activity {
         setContentView(R.layout.activity_weibo_login);
         getActionBar().setDisplayShowHomeEnabled(false);
         initViews();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     private WebView mWebView;

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.umeng.analytics.MobclickAgent;
 import com.yugy.qingbo.R;
 import com.yugy.qingbo.sql.Account;
 import com.yugy.qingbo.sql.AccountsDataSource;
@@ -39,6 +40,7 @@ public class AccountActivity extends ListActivity {
     protected void onResume() {
         accounts = accountsDataSource.getAllAccounts();
         adapter.notifyDataSetChanged();
+        MobclickAgent.onResume(this);
         super.onResume();
     }
 
@@ -99,6 +101,12 @@ public class AccountActivity extends ListActivity {
         accountsDataSource.close();
         usersDataSource.close();
         super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     @Override

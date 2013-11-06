@@ -34,7 +34,8 @@ public class TimeLineModel {
     public void parse(JSONObject json) throws JSONException, ParseException {
         text = FuncStr.parseStatusText(json.getString("text"));
         name = json.getJSONObject("user").getString("screen_name");
-        headUrl = json.getJSONObject("user").getString("profile_image_url");
+        headUrl = json.getJSONObject("user").getString("avatar_large");
+//        headUrl = json.getJSONObject("user").getString("profile_image_url");
         topics = new ArrayList<String>();
         topics.addAll(FuncStr.getTopic(json.getString("text")));
         unParseTime = json.getString("created_at");

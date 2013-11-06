@@ -15,27 +15,69 @@
             android:id="@+id/main_timeline_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ffeeeeee"
-            android:dividerHeight="0dp"
-            android:divider="@null"
-            android:listSelector="@android:color/transparent"
-            android:cacheColorHint="@android:color/transparent"
+            android:background="#e5e5e5"
+            android:dividerHeight="14dp"
+            android:divider="#e5e5e5"
+            android:drawSelectorOnTop="true"
+            android:listSelector="@drawable/listitem_selector"
+            android:cacheColorHint="#e5e5e5"
             android:scrollbarStyle="insideOverlay"
-            android:overScrollMode="never"
             />
 
     </uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>
 
-    <ListView
+    <RelativeLayout
         android:id="@+id/main_left_drawer"
-        android:layout_width="240dp"
         android:layout_height="match_parent"
+        android:layout_width="280dp"
         android:layout_gravity="start"
-        android:overScrollMode="never"
-        android:choiceMode="singleChoice"
-        android:divider="#ff242424"
-        android:dividerHeight="1dp"
-        android:background="#111"
-        />
+        android:background="#FFF"
+        >
+
+        <View
+            android:id="@+id/main_left_drawer_person"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@drawable/bg_person"
+            />
+
+        <ListView
+            android:id="@+id/main_left_drawer_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/main_left_drawer_person"
+            android:choiceMode="singleChoice"
+            android:divider="#ddd"
+            android:dividerHeight="1dp"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/main_right_drawer"
+        android:layout_height="match_parent"
+        android:layout_width="300dp"
+        android:layout_gravity="end"
+        android:background="#FFF"
+        >
+
+        <ListView
+            android:id="@+id/main_right_drawer_list"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            />
+
+        <TextView
+            android:id="@+id/main_right_drawer_emptyview"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="没有未读通知！"
+            android:textColor="#666"
+            android:textSize="16sp"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            />
+
+    </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>

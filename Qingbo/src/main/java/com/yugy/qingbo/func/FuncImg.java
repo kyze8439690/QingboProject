@@ -5,6 +5,4 @@ package com.yugy.qingbo.func;
  */
 public class FuncImg {
 
-
-
 }

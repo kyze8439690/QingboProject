@@ -10,6 +10,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -17,8 +19,22 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         android:name=".application.MyApplication">
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="527a5ce756240b8266055450" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="apk" />
+
+        <service
+            android:name="com.umeng.common.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+
         <activity
             android:name="com.yugy.qingbo.activity.MainActivity"
+            android:icon="@drawable/ic_actionbar_gplus"
             android:label="@string/app_name" >
 
             <intent-filter>

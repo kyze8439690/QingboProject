@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -12,14 +14,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
 import com.yugy.qingbo.R;
 import com.yugy.qingbo.func.Func;
+import com.yugy.qingbo.func.FuncInt;
 import com.yugy.qingbo.model.TimeLineModel;
 import com.yugy.qingbo.sdk.Weibo;
 import com.yugy.qingbo.sql.AccountsDataSource;
@@ -31,16 +42,21 @@ import org.json.JSONException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import uk.co.senab.actionbarpulltorefresh.library.DefaultHeaderTransformer;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshAttacher;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 
 public class MainActivity extends Activity implements ListView.OnItemClickListener, PullToRefreshAttacher.OnRefreshListener{
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    private RelativeLayout mDrawerLeftLayout;
+    private RelativeLayout mDrawerRightLayout;
+    private ListView mDrawerLeftList;
+    private ListView mDrawerRightList;
     private ListView mTimeLineList;
     private ActionBar mActionbar;
     private ActionBarDrawerToggle mDrawerToggle;
+    private TextView mEmptyView;
 
     private PullToRefreshAttacher mPullToRefreshAttacher;
     private PullToRefreshLayout mPullToRefreshLayout;
@@ -48,6 +64,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     private String[] drawerListViewString;
     private ArrayList<TimeLineModel> timeLineData;
     private BaseAdapter timeLineListAdapter;
+    private AnimationDrawable mJingleDrawable;
 
     private long lastStatusId = 0;
 
@@ -56,6 +73,10 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//        Debug.startMethodTracing();
+        MobclickAgent.setDebugMode(true);
+        MobclickAgent.onError(this);
+        UmengUpdateAgent.update(this);
         appInit();
         initViews();
         initComponents();
@@ -78,12 +99,31 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                             e.printStackTrace();
                         }
                     }
+                    Func.myToast("更新了" + response.length() +"条新微薄");
                     mPullToRefreshAttacher.setRefreshing(false);
                     timeLineListAdapter.notifyDataSetChanged();
                     super.onSuccess(response);
                 }
             });
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+//        Debug.stopMethodTracing();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onResume(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     private void appInit(){
@@ -98,34 +138,68 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     private void initViews(){
         mDrawerLayout = (DrawerLayout) findViewById(R.id.main_drawerlayout);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
         mActionbar = getActionBar();
         mActionbar.setDisplayHomeAsUpEnabled(true);
         mActionbar.setHomeButtonEnabled(true);
-        mDrawerListView = (ListView) findViewById(R.id.main_left_drawer);
+        mDrawerLeftLayout = (RelativeLayout) findViewById(R.id.main_left_drawer);
+        mDrawerLeftList = (ListView) findViewById(R.id.main_left_drawer_list);
+        mDrawerRightLayout = (RelativeLayout) findViewById(R.id.main_right_drawer);
+        mDrawerRightList = (ListView) findViewById(R.id.main_right_drawer_list);
+        mEmptyView = (TextView) findViewById(R.id.main_right_drawer_emptyview);
+        mJingleDrawable = (AnimationDrawable) getResources().getDrawable(R.drawable.jingles);
+        mEmptyView.setCompoundDrawablesWithIntrinsicBounds(null, mJingleDrawable, null, null);
+        mEmptyView.setCompoundDrawablePadding(FuncInt.dp(10));
+        mDrawerRightList.setEmptyView(mEmptyView);
         mTimeLineList = (ListView) findViewById(R.id.main_timeline_list);
+        PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), false, true);
+        mTimeLineList.setOnScrollListener(pauseOnScrollListener);
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.main_refreshlayout);
         mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
+        DefaultHeaderTransformer headerTransformer = (DefaultHeaderTransformer) mPullToRefreshAttacher.getHeaderTransformer();
+        headerTransformer.setProgressBarColor(Color.argb(255, 92, 50, 146));
+        headerTransformer.setPullText("向下滑动即可刷新");
+        headerTransformer.setRefreshingText("正在刷新...");
         mPullToRefreshLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
 
         drawerListViewString = new String[]{
             "账号",
             "设置"
         };
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+        mDrawerLeftList.setAdapter(new ArrayAdapter<String>(
                 this,
                 R.layout.widget_drawer_menu_item,
                 drawerListViewString
         ));
-        mDrawerListView.setOnItemClickListener(this);
+        mDrawerLeftList.setOnItemClickListener(this);
+        mDrawerRightList.setOnItemClickListener(this);
+        mTimeLineList.setOnItemClickListener(this);
 
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,
                 mDrawerLayout,
                 R.drawable.ic_drawer_toggle,
                 R.string.app_name,
-                R.string.app_name
-        );
+                R.string.app_name){
+
+                @Override
+                public void onDrawerOpened(View drawerView) {
+                    if(drawerView.equals(mDrawerRightLayout)){
+                        if(mJingleDrawable.isVisible()){
+                            if(mJingleDrawable.isRunning()){
+                                mJingleDrawable.stop();
+                            }
+                            mJingleDrawable.start();
+
+                        }
+                    }
+                    if(mDrawerLayout.isDrawerOpen(Gravity.END) && drawerView.equals(mDrawerLeftLayout)){
+                        mDrawerLayout.closeDrawer(Gravity.END);
+                    }else if(mDrawerLayout.isDrawerOpen(Gravity.START) && drawerView.equals(mDrawerRightLayout)){
+                        mDrawerLayout.closeDrawer(Gravity.START);
+                    }
+                    super.onDrawerOpened(drawerView);
+                }
+        };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
@@ -145,6 +219,8 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                 return item;
             }
 
+            private int adapterLastPosition = -1;
+
             @Override
             public long getItemId(int position) {
                 return position;
@@ -159,6 +235,18 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                     item = new TimeLineListItem(MainActivity.this);
                 }
                 item.parse(timeLineData.get(position));
+                if (position > adapterLastPosition) {
+                    item.setTranslationX(0.0f);
+                    item.setTranslationY(200);
+                    item.setRotationX(45.0f);
+                    item.setScaleX(0.7f);
+                    item.setScaleY(0.55f);
+                    ViewPropertyAnimator localViewPropertyAnimator = item.animate().rotationX(0.0f).rotationY(0.0f)
+                            .translationX(0).translationY(0).setDuration(600)
+                            .scaleX(1.0f).scaleY(1.0f).setInterpolator(new DecelerateInterpolator());
+                    localViewPropertyAnimator.setStartDelay(0).start();
+                    adapterLastPosition = position;
+                }
                 return item;
             }
         };
@@ -179,8 +267,12 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
             return true;
         }
         switch (item.getItemId()){
-            case R.id.main_action_refresh:
-                item.setVisible(false);
+            case R.id.main_action_notify:
+                if(mDrawerLayout.isDrawerVisible(Gravity.END)){
+                    mDrawerLayout.closeDrawer(mDrawerRightLayout);
+                }else{
+                    mDrawerLayout.openDrawer(mDrawerRightLayout);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -200,10 +292,14 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switch(position){
-            case 0:
-                startActivity(new Intent(MainActivity.this, AccountActivity.class));
-                break;
+        if(parent.equals(mDrawerLeftList)){
+            switch(position){
+                case 0:
+                    startActivity(new Intent(MainActivity.this, AccountActivity.class));
+                    break;
+            }
+        }else if(parent.equals(mTimeLineList)){
+            Func.myToast("123");
         }
     }
 
@@ -235,9 +331,9 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                 }
                 timeLineListAdapter.notifyDataSetChanged();
                 if(response.length() == 0){
-                    Func.toast("没有新微博");
+                    Func.myToast("没有新微博");
                 }else{
-                    Func.toast("更新了" + response.length() +"条新微薄");
+                    Func.myToast("更新了" + response.length() +"条新微薄");
                 }
                 mPullToRefreshAttacher.setRefreshComplete();
                 super.onSuccess(response);

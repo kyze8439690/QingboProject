@@ -8,6 +8,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.yugy.qingbo.R;
 
 import java.io.File;
@@ -26,6 +27,7 @@ public class MyApplication extends Application {
                 .showImageForEmptyUri(R.drawable.ic_launcher)
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
+                .displayer(new FadeInBitmapDisplayer(600))
                 .build();
         File cacheDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Qingbo/cache");
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())

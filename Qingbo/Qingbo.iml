@@ -70,9 +70,11 @@
     <orderEntry type="jdk" jdkName="Android API 18 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-13.0.0" level="project" />
+    <orderEntry type="library" exported="" name="lib" level="project" />
     <orderEntry type="library" exported="" name="android-async-http" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.8.6" level="project" />
     <orderEntry type="library" exported="" name="ComGithubChrisbanesActionbarpulltorefreshLibrary08.aar" level="project" />
+    <orderEntry type="library" exported="" name="umeng_sdk" level="project" />
   </component>
 </module>
 
