@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yugy.qingbo"
-    android:versionCode="1"
+    android:versionCode="2"
     android:versionName="1.0" >
 
     <uses-sdk
@@ -44,9 +44,9 @@
 
         </activity>
         <activity
-            android:name="com.yugy.qingbo.activity.AccountActivity"
+            android:name=".activity.AccountActivity"
             android:label="@string/title_activity_account"
-            android:parentActivityName="com.yugy.qingbo.activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.yugy.qingbo.activity.MainActivity" />
@@ -54,6 +54,15 @@
         <activity
             android:name=".activity.WeiboLoginActivity"
             android:label="@string/title_activity_weibo_login" >
+        </activity>
+        <activity
+            android:name=".activity.DetailActivity"
+            android:theme="@style/DetailTheme"
+            android:icon="@drawable/ic_actionbar_gplus"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.yugy.qingbo.activity.MainActivity" />
         </activity>
     </application>
 

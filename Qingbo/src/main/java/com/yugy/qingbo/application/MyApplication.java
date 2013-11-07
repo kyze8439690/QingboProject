@@ -22,9 +22,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showStubImage(R.drawable.ic_launcher)
+                .showStubImage(R.drawable.jingles_1)
                 .showImageForEmptyUri(R.drawable.ic_launcher)
-                .showImageForEmptyUri(R.drawable.ic_launcher)
+                .showImageOnFail(R.drawable.ic_image_fail)
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
                 .displayer(new FadeInBitmapDisplayer(600))

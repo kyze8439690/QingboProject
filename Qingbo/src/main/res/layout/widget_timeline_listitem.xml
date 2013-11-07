@@ -80,12 +80,13 @@
         android:visibility="gone"
         />
 
-    <ImageView
+    <com.yugy.qingbo.widget.SeletorImageView
         android:id="@+id/timeline_listitem_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="25dp"
-        android:maxHeight="150dp"
+        android:maxWidth="250dp"
+        android:maxHeight="200dp"
         android:background="#CCC"
         android:layout_below="@id/timeline_listitem_repost_text"
         android:layout_marginTop="14dp"

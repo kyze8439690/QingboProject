@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -31,9 +30,11 @@ import com.umeng.update.UmengUpdateAgent;
 import com.yugy.qingbo.R;
 import com.yugy.qingbo.func.Func;
 import com.yugy.qingbo.func.FuncInt;
+import com.yugy.qingbo.func.FuncNet;
 import com.yugy.qingbo.model.TimeLineModel;
 import com.yugy.qingbo.sdk.Weibo;
 import com.yugy.qingbo.sql.AccountsDataSource;
+import com.yugy.qingbo.storage.ColorList;
 import com.yugy.qingbo.widget.TimeLineListItem;
 
 import org.json.JSONArray;
@@ -60,6 +61,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     private PullToRefreshAttacher mPullToRefreshAttacher;
     private PullToRefreshLayout mPullToRefreshLayout;
+    private DefaultHeaderTransformer headerTransformer;
     private AccountsDataSource accountsDataSource;
     private String[] drawerListViewString;
     private ArrayList<TimeLineModel> timeLineData;
@@ -81,30 +83,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
         initViews();
         initComponents();
         if(hasAccount()){
-            mPullToRefreshAttacher.setRefreshing(true);
-            Weibo.getTimeline(this, lastStatusId + "", new JsonHttpResponseHandler(){
-                @Override
-                public void onSuccess(JSONArray response) {
-                    for(int i = 0; i < response.length(); i++){
-                        TimeLineModel data = new TimeLineModel();
-                        try {
-                            if(i == 0){
-                                lastStatusId = response.getJSONObject(i).getLong("id");
-                            }
-                            data.parse(response.getJSONObject(i));
-                            timeLineData.add(data);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    Func.myToast("更新了" + response.length() +"条新微薄");
-                    mPullToRefreshAttacher.setRefreshing(false);
-                    timeLineListAdapter.notifyDataSetChanged();
-                    super.onSuccess(response);
-                }
-            });
+            getNewData();
         }
     }
 
@@ -128,6 +107,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     private void appInit(){
         Func.setContext(getApplicationContext());
+        FuncNet.setContext(getApplicationContext());
     }
 
     private boolean hasAccount(){
@@ -154,12 +134,6 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), false, true);
         mTimeLineList.setOnScrollListener(pauseOnScrollListener);
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.main_refreshlayout);
-        mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
-        DefaultHeaderTransformer headerTransformer = (DefaultHeaderTransformer) mPullToRefreshAttacher.getHeaderTransformer();
-        headerTransformer.setProgressBarColor(Color.argb(255, 92, 50, 146));
-        headerTransformer.setPullText("向下滑动即可刷新");
-        headerTransformer.setRefreshingText("正在刷新...");
-        mPullToRefreshLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
 
         drawerListViewString = new String[]{
             "账号",
@@ -251,6 +225,20 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
             }
         };
         mTimeLineList.setAdapter(timeLineListAdapter);
+        mPullToRefreshAttacher = PullToRefreshAttacher.get(this);
+        headerTransformer = (DefaultHeaderTransformer) mPullToRefreshAttacher.getHeaderTransformer();
+        headerTransformer.setProgressBarColor(ColorList.getColor());
+        headerTransformer.setPullText("向下滑动即可刷新");
+        headerTransformer.setRefreshingText("正在刷新...");
+        mPullToRefreshAttacher.setHeaderViewListener(new PullToRefreshAttacher.HeaderViewListener() {
+            @Override
+            public void onStateChanged(View view, int i) {
+                if(i == PullToRefreshAttacher.HeaderViewListener.STATE_VISIBLE){
+                    headerTransformer.setProgressBarColor(ColorList.getColor());
+                }
+            }
+        });
+        mPullToRefreshLayout.setPullToRefreshAttacher(mPullToRefreshAttacher, this);
     }
 
 
@@ -299,8 +287,35 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                     break;
             }
         }else if(parent.equals(mTimeLineList)){
-            Func.myToast("123");
+
         }
+    }
+
+    private void getNewData(){
+        mPullToRefreshAttacher.setRefreshing(true);
+        Weibo.getTimeline(this, lastStatusId + "", new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONArray response) {
+                for(int i = 0; i < response.length(); i++){
+                    TimeLineModel data = new TimeLineModel();
+                    try {
+                        if(i == 0){
+                            lastStatusId = response.getJSONObject(i).getLong("id");
+                        }
+                        data.parse(response.getJSONObject(i));
+                        timeLineData.add(data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Func.myToast("更新了" + response.length() +"条新微薄");
+                mPullToRefreshAttacher.setRefreshing(false);
+                timeLineListAdapter.notifyDataSetChanged();
+                super.onSuccess(response);
+            }
+        });
     }
 
     @Override

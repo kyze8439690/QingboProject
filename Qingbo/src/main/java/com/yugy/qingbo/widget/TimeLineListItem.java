@@ -1,6 +1,7 @@
 package com.yugy.qingbo.widget;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,9 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.yugy.qingbo.R;
+import com.yugy.qingbo.activity.DetailActivity;
 import com.yugy.qingbo.func.FuncInt;
+import com.yugy.qingbo.func.FuncNet;
 import com.yugy.qingbo.model.TimeLineModel;
 
 /**
@@ -29,11 +32,13 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
     private TextView text;
     private TextView topic;
     private TextView time;
-    private ImageView pic;
+    private SeletorImageView pic;
     private TextView repostName;
     private TextView repostText;
     private TextView commentCount;
     private TextView repostCount;
+
+    private TimeLineModel data;
 
     private void init(){
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
@@ -44,7 +49,7 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
         text.setMovementMethod(LinkMovementMethod.getInstance());
         topic = (TextView) findViewById(R.id.timeline_listitem_topic);
         time = (TextView) findViewById(R.id.timeline_listitem_time);
-        pic = (ImageView) findViewById(R.id.timeline_listitem_pic);
+        pic = (SeletorImageView) findViewById(R.id.timeline_listitem_pic);
         repostName = (TextView) findViewById(R.id.timeline_listitem_repost_name);
         repostName.setMovementMethod(LinkMovementMethod.getInstance());
         repostText = (TextView) findViewById(R.id.timeline_listitem_repost_text);
@@ -52,14 +57,20 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
         commentCount = (TextView) findViewById(R.id.timeline_listitem_commentcount);
         repostCount = (TextView) findViewById(R.id.timeline_listitem_repostcount);
 
+        pic.setOnClickListener(this);
         commentCount.setOnClickListener(this);
         repostCount.setOnClickListener(this);
     }
 
     public void parse(TimeLineModel data){
+        this.data = data;
         if(data.hasPic){
             pic.setVisibility(VISIBLE);
-            ImageLoader.getInstance().displayImage(data.picUrl, pic);
+            if(FuncNet.isWifi()){
+                ImageLoader.getInstance().displayImage(data.picUrlMiddle, pic);
+            }else{
+                ImageLoader.getInstance().displayImage(data.picUrl, pic);
+            }
         }else{
             pic.setVisibility(GONE);
         }
@@ -72,7 +83,11 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
         if(data.hasRepost){
             if(data.hasRepostPic){
                 pic.setVisibility(VISIBLE);
-                ImageLoader.getInstance().displayImage(data.repostPicUrl, pic);
+                if(FuncNet.isWifi()){
+                    ImageLoader.getInstance().displayImage(data.repostPicUrlMiddle, pic);
+                }else{
+                    ImageLoader.getInstance().displayImage(data.repostPicUrl, pic);
+                }
             }else{
                 pic.setVisibility(GONE);
             }
@@ -110,6 +125,17 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()){
+            case R.id.timeline_listitem_pic:
+                Intent intent = new Intent(getContext(), DetailActivity.class);
+                intent.putExtra("data", data);
+                if(data.hasRepostPic){
+                    intent.putExtra("viewType", DetailActivity.VIEW_TYPE_REPOST_PIC);
+                }else{
+                    intent.putExtra("viewType", DetailActivity.VIEW_TYPE_PIC);
+                }
+                getContext().startActivity(intent);
+                break;
+        }
     }
 }
