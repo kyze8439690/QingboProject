@@ -10,16 +10,16 @@ import android.widget.ImageView;
 /**
  * Created by yugy on 13-11-7.
  */
-public class SeletorImageView extends ImageView{
-    public SeletorImageView(Context context) {
+public class SelectorImageView extends ImageView{
+    public SelectorImageView(Context context) {
         super(context);
     }
 
-    public SeletorImageView(Context context, AttributeSet attrs) {
+    public SelectorImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public SeletorImageView(Context context, AttributeSet attrs, int defStyle) {
+    public SelectorImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

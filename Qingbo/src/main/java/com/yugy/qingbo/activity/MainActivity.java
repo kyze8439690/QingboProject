@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -68,8 +69,8 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     private BaseAdapter timeLineListAdapter;
     private AnimationDrawable mJingleDrawable;
 
+    private long firstStatusId = 0;
     private long lastStatusId = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +132,9 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
         mEmptyView.setCompoundDrawablePadding(FuncInt.dp(10));
         mDrawerRightList.setEmptyView(mEmptyView);
         mTimeLineList = (ListView) findViewById(R.id.main_timeline_list);
+        ProgressBar progressBar = new ProgressBar(this);
+        progressBar.setIndeterminate(true);
+        mTimeLineList.addFooterView(progressBar);
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), false, true);
         mTimeLineList.setOnScrollListener(pauseOnScrollListener);
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.main_refreshlayout);
@@ -221,6 +225,9 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                     localViewPropertyAnimator.setStartDelay(0).start();
                     adapterLastPosition = position;
                 }
+                if(position == getCount() - 1){
+                    getOldData();
+                }
                 return item;
             }
         };
@@ -293,13 +300,15 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     private void getNewData(){
         mPullToRefreshAttacher.setRefreshing(true);
-        Weibo.getTimeline(this, lastStatusId + "", new JsonHttpResponseHandler(){
+        Weibo.getNewTimeline(this, firstStatusId + "", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONArray response) {
-                for(int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     TimeLineModel data = new TimeLineModel();
                     try {
-                        if(i == 0){
+                        if (i == 0) {
+                            firstStatusId = response.getJSONObject(i).getLong("id");
+                        }else if(i == response.length() - 1){
                             lastStatusId = response.getJSONObject(i).getLong("id");
                         }
                         data.parse(response.getJSONObject(i));
@@ -310,7 +319,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                         e.printStackTrace();
                     }
                 }
-                Func.myToast("更新了" + response.length() +"条新微薄");
+                Func.myToast("更新了" + response.length() + "条新微薄");
                 mPullToRefreshAttacher.setRefreshing(false);
                 timeLineListAdapter.notifyDataSetChanged();
                 super.onSuccess(response);
@@ -318,23 +327,50 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
         });
     }
 
-    @Override
-    public void onRefreshStarted(View view) {
-        Weibo.getTimeline(this, lastStatusId + "", new JsonHttpResponseHandler(){
+    private void getOldData(){
+        mPullToRefreshAttacher.setRefreshing(true);
+        Weibo.getOldTimeline(this, lastStatusId + "", new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONArray response) {
-                for(int i = 0; i < timeLineData.size(); i++){
-                    try{
-                        timeLineData.get(i).reParseTime();
-                    }catch (ParseException e){
+                for (int i = 1; i < response.length(); i++) {
+                    TimeLineModel data = new TimeLineModel();
+                    try {
+                        if(i == response.length() - 1){
+                            lastStatusId = response.getJSONObject(i).getLong("id");
+                        }
+                        data.parse(response.getJSONObject(i));
+                        timeLineData.add(timeLineData.size(), data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
-                for(int i = response.length() - 1; i >= 0; i--){
+                Func.myToast("加载了" + (response.length() - 1) + "条微薄");
+                timeLineListAdapter.notifyDataSetChanged();
+                mPullToRefreshAttacher.setRefreshComplete();
+                super.onSuccess(response);
+            }
+        });
+    }
+
+    @Override
+    public void onRefreshStarted(View view) {
+        Weibo.getNewTimeline(this, firstStatusId + "", new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(JSONArray response) {
+                for (int i = 0; i < timeLineData.size(); i++) {
+                    try {
+                        timeLineData.get(i).reParseTime();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                for (int i = response.length() - 1; i >= 0; i--) {
                     TimeLineModel data = new TimeLineModel();
                     try {
-                        if(i == 0){
-                            lastStatusId = response.getJSONObject(i).getLong("id");
+                        if (i == 0) {
+                            firstStatusId = response.getJSONObject(i).getLong("id");
                         }
                         data.parse(response.getJSONObject(i));
                         timeLineData.add(0, data);
@@ -345,10 +381,10 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                     }
                 }
                 timeLineListAdapter.notifyDataSetChanged();
-                if(response.length() == 0){
+                if (response.length() == 0) {
                     Func.myToast("没有新微博");
-                }else{
-                    Func.myToast("更新了" + response.length() +"条新微薄");
+                } else {
+                    Func.myToast("更新了" + response.length() + "条新微薄");
                 }
                 mPullToRefreshAttacher.setRefreshComplete();
                 super.onSuccess(response);

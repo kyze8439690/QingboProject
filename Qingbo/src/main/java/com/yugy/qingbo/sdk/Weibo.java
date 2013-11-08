@@ -12,7 +12,6 @@ import com.yugy.qingbo.sql.AccountsDataSource;
 import com.yugy.qingbo.sql.UsersDataSource;
 import com.yugy.qingbo.storage.Conf;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -96,11 +95,34 @@ public class Weibo {
 
     }
 
-    public static void getTimeline(Context context, String lastStatusId, final JsonHttpResponseHandler responseHandler){
+    public static void getNewTimeline(Context context, String firstStatusId, final JsonHttpResponseHandler responseHandler){
         RequestParams params = getParamsWithAccessToken(context);
-//        params.put("trim_user", "1");
-//        params.put("feature", "1");
-        params.put("since_id", lastStatusId);
+        params.put("since_id", firstStatusId);
+        mClient.get(context, WeiboApiUrl.STATUS_HOME_TIMELINE, params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(JSONObject response) {
+                Func.log(response.toString());
+                try {
+                    responseHandler.onSuccess(response.getJSONArray("statuses"));
+                } catch (JSONException e) {
+                    responseHandler.onFailure(e, "获取用户信息失败");
+                    e.printStackTrace();
+                }
+                super.onSuccess(response);
+            }
+
+            @Override
+            public void onFailure(Throwable e, JSONObject errorResponse) {
+                Func.log(errorResponse.toString());
+                super.onFailure(e, errorResponse);
+            }
+        });
+    }
+
+    public static void getOldTimeline(Context context, String lastStatusId, final JsonHttpResponseHandler responseHandler){
+        RequestParams params = getParamsWithAccessToken(context);
+        params.put("max_id", lastStatusId);
+        params.put("count", 21 + "");
         mClient.get(context, WeiboApiUrl.STATUS_HOME_TIMELINE, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONObject response) {

@@ -76,18 +76,31 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/timeline_listitem_repost_name"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="14dp"
         android:visibility="gone"
         />
 
-    <com.yugy.qingbo.widget.SeletorImageView
+    <com.yugy.qingbo.widget.SelectorImageView
         android:id="@+id/timeline_listitem_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="25dp"
         android:maxWidth="250dp"
         android:maxHeight="200dp"
-        android:background="#CCC"
+        android:background="#eee"
+        android:layout_below="@id/timeline_listitem_repost_text"
+        android:layout_marginTop="14dp"
+        android:visibility="gone"
+        />
+    
+    <com.yugy.qingbo.widget.NoScrollGridView
+        android:id="@+id/timeline_listitem_picgrid"
+        android:layout_height="wrap_content"
+        android:layout_width="246dp"
+        android:horizontalSpacing="3dp"
+        android:verticalSpacing="3dp"
+        android:numColumns="3"
+        android:drawSelectorOnTop="true"
         android:layout_below="@id/timeline_listitem_repost_text"
         android:layout_marginTop="14dp"
         android:visibility="gone"
@@ -114,8 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/timeline_listitem_commentcount"
-        android:layout_below="@id/timeline_listitem_pic"
-        android:layout_marginTop="28dp"
+        android:layout_alignTop="@id/timeline_listitem_commentcount"
         android:text="1"
         android:textStyle="bold"
         android:textSize="13sp"

@@ -1,22 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.yugy.qingbo.widget.SlidingUpPanelLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/detail_rootlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000"
     >
 
-    <ImageView
-        android:id="@+id/detail_pic"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        >
 
-    <ProgressBar
-        android:id="@+id/detail_progress"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true"
-        style="@android:style/Widget.Holo.ProgressBar"/>
+        <com.yugy.qingbo.widget.HackyViewPager
+            android:id="@+id/detail_picpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
-</RelativeLayout>
+        <ProgressBar
+            android:id="@+id/detail_progress"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerInParent="true"
+            style="@android:style/Widget.Holo.ProgressBar"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/detail_frontlayout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:paddingTop="48dp"
+        >
+
+        <RelativeLayout
+            android:layout_height="82dp"
+            android:layout_width="match_parent"
+            android:background="@drawable/black_gradient"
+            android:id="@+id/detail_frontlayout_head_layout">
+
+            <ImageView
+                android:id="@+id/detail_head"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="10dp"
+                />
+
+            <TextView
+                android:id="@+id/detail_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="#FFF"
+                android:layout_toRightOf="@id/detail_head"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                />
+
+            <TextView
+                android:id="@+id/detail_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFF"
+                android:textSize="14sp"
+                android:layout_toRightOf="@id/detail_head"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="14dp"
+                android:layout_below="@id/detail_name"
+                android:singleLine="true"
+                android:ellipsize="end"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/detail_frontlayout_content_layout"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_below="@id/detail_frontlayout_head_layout">
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</com.yugy.qingbo.widget.SlidingUpPanelLayout>

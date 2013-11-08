@@ -7,17 +7,13 @@
         <item name="android:actionBarStyle">@style/actionBarStyle</item>
     </style>
 
-    <style name="DetailTheme" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@style/detailActionBarStyle</item>
+    <style name="DetailTheme" parent="android:Theme.Holo.Light">
         <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
     <style name="actionBarStyle" parent="android:Widget.Holo.Light.ActionBar">
         <item name="android:background">@drawable/ab_solid_light_holo</item>
-    </style>
-
-    <style name="detailActionBarStyle" parent="android:Widget.Holo.ActionBar">
-        <item name="android:background">@android:color/transparent</item>
     </style>
 
 </resources>

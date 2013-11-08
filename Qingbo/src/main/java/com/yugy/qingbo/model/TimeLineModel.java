@@ -6,6 +6,7 @@ import android.text.SpannableString;
 
 import com.yugy.qingbo.func.FuncStr;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,16 +25,13 @@ public class TimeLineModel implements Parcelable{
     public int commentCount;
     public int repostCount;
     public boolean hasPic;
-    public String picUrl = "";
-    public String picUrlMiddle = "";
-    public String picUrlHD = "";
+    public boolean hasPics;
+    public ArrayList<String> pics = new ArrayList<String>();
     public boolean hasRepost;
     public SpannableString repostName = new SpannableString("");
     public SpannableString repostText = new SpannableString("");
     public boolean hasRepostPic;
-    public String repostPicUrl = "";
-    public String repostPicUrlMiddle = "";
-    public String repostPicUrlHD = "";
+    public boolean hasRepostPics;
 
     private String unParseTime;
 
@@ -47,21 +45,23 @@ public class TimeLineModel implements Parcelable{
         time = FuncStr.parseTime(unParseTime);
         commentCount = json.getInt("comments_count");
         repostCount = json.getInt("reposts_count");
-        if (hasPic = json.has("thumbnail_pic")) {
-            picUrl = json.getString("thumbnail_pic");
-            picUrlMiddle = json.getString("bmiddle_pic");
-            picUrlHD = json.getString("original_pic");
+        JSONArray picsJson = json.getJSONArray("pic_urls");
+        hasPics = (picsJson.length() > 1);
+        for (int i = 0; i < picsJson.length(); i++){
+            pics.add(picsJson.getJSONObject(i).getString("thumbnail_pic"));
         }
+        hasPic = json.has("thumbnail_pic");
         if (hasRepost = json.has("retweeted_status")) {
             JSONObject repostJson = json.getJSONObject("retweeted_status");
             repostName = FuncStr.parseStatusText("此微博最初是由@" + repostJson.getJSONObject("user").getString("screen_name") + " 分享的");
             repostText = FuncStr.parseStatusText(repostJson.getString("text"));
             topics.addAll(FuncStr.getTopic(repostJson.getString("text")));
-            if (hasRepostPic = repostJson.has("thumbnail_pic")) {
-                repostPicUrl = repostJson.getString("thumbnail_pic");
-                repostPicUrlMiddle = repostJson.getString("bmiddle_pic");
-                repostPicUrlHD = repostJson.getString("original_pic");
+            JSONArray repostPicsJson = repostJson.getJSONArray("pic_urls");
+            hasRepostPics = (repostPicsJson.length() > 1);
+            for (int i = 0; i < repostPicsJson.length(); i++){
+                pics.add(repostPicsJson.getJSONObject(i).getString("thumbnail_pic"));
             }
+            hasRepostPic = repostJson.has("thumbnail_pic");
         }
     }
 
@@ -82,24 +82,23 @@ public class TimeLineModel implements Parcelable{
         });
         dest.writeBooleanArray(new boolean[]{
                 hasPic,
+                hasPics,
                 hasRepost,
-                hasRepostPic
+                hasRepostPic,
+                hasRepostPics
         });
         dest.writeStringArray(new String[]{
                 text.toString(),
                 name,
                 headUrl,
                 unParseTime,
-                picUrl,
-                picUrlMiddle,
-                picUrlHD,
                 repostName.toString(),
                 repostText.toString(),
-                repostPicUrl,
-                repostPicUrlMiddle,
-                repostPicUrlHD
         });
-        dest.writeStringList(topics);
+        ArrayList<ArrayList<String>> stringArrayData = new ArrayList<ArrayList<String>>();
+        stringArrayData.add(topics);
+        stringArrayData.add(pics);
+        dest.writeList(stringArrayData);
     }
 
     public TimeLineModel(){}
@@ -110,30 +109,28 @@ public class TimeLineModel implements Parcelable{
         this.commentCount = intData[0];
         this.repostCount = intData[1];
 
-        boolean[] booleanData = new boolean[3];
+        boolean[] booleanData = new boolean[5];
         in.readBooleanArray(booleanData);
         this.hasPic = booleanData[0];
-        this.hasRepost = booleanData[1];
-        this.hasRepostPic = booleanData[2];
+        this.hasPics = booleanData[1];
+        this.hasRepost = booleanData[2];
+        this.hasRepostPic = booleanData[3];
+        this.hasRepostPics = booleanData[4];
 
-        String[] stringData = new String[12];
+        String[] stringData = new String[6];
         in.readStringArray(stringData);
         this.text = FuncStr.parseStatusText(stringData[0]);
         this.name = stringData[1];
         this.headUrl = stringData[2];
         this.unParseTime = stringData[3];
         this.time = FuncStr.parseTime(this.unParseTime);
-        this.picUrl = stringData[4];
-        this.picUrlMiddle = stringData[5];
-        this.picUrlHD = stringData[6];
-        this.repostName = FuncStr.parseStatusText(stringData[7]);
-        this.repostText = FuncStr.parseStatusText(stringData[8]);
-        this.repostPicUrl = stringData[9];
-        this.repostPicUrlMiddle = stringData[10];
-        this.repostPicUrlHD = stringData[11];
+        this.repostName = FuncStr.parseStatusText(stringData[4]);
+        this.repostText = FuncStr.parseStatusText(stringData[5]);
 
-        this.topics = new ArrayList<String>();
-        in.readStringList(this.topics);
+        ArrayList<ArrayList<String>> stringArrayData = new ArrayList<ArrayList<String>>();
+        in.readList(stringArrayData, ArrayList.class.getClassLoader());
+        this.topics = stringArrayData.get(0);
+        this.pics = stringArrayData.get(1);
     }
 
     public static final Creator CREATOR = new Creator() {
