@@ -35,8 +35,9 @@
         >
 
         <RelativeLayout
-            android:layout_height="82dp"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent"
+            android:paddingBottom="12dp"
             android:background="@drawable/black_gradient"
             android:id="@+id/detail_frontlayout_head_layout">
 
@@ -61,7 +62,7 @@
                 />
 
             <TextView
-                android:id="@+id/detail_content"
+                android:id="@+id/detail_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#FFF"
@@ -80,7 +81,23 @@
             android:id="@+id/detail_frontlayout_content_layout"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
+            android:background="@drawable/bg_detail_contentlayout"
             android:layout_below="@id/detail_frontlayout_head_layout">
+
+            <TextView
+                android:id="@+id/detail_repost_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                />
+
+            <TextView
+                android:id="@+id/detail_repost_text"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_below="@id/detail_repost_name"
+                android:layout_marginTop="14dp"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 

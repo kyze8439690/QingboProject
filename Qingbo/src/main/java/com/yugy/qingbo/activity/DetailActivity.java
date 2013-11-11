@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.PagerAdapter;
+import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,21 +59,46 @@ public class DetailActivity extends Activity implements View.OnClickListener{
     private TextView actionbarTitle;
     private ImageView head;
     private TextView name;
-    private TextView content;
+    private TextView text;
+    private TextView repostName;
+    private TextView repostText;
 
     private TimeLineModel data;
-
+    private Drawable actionBarBackgroundDrawable;
+    private Drawable repostNameBackgroundDrawable;
 
     public final static String DATA = "data";
     public final static String VIEW_TYPE = "viewType";
     public final static String VIEW_PICS_ITEM_ID = "picId";
-    public final static int VIEW_TYPE_PIC = 0;
+
+    public final static int VIEW_TYPE_CONTENT = 0;
+    public final static int VIEW_TYPE_PIC = 1;
 
     private void getData(){
         data = getIntent().getParcelableExtra(DATA);
         switch (getIntent().getIntExtra(VIEW_TYPE, -1)){
             case VIEW_TYPE_PIC:
                 displayImage(getIntent().getIntExtra(VIEW_PICS_ITEM_ID, -1));
+                break;
+            case VIEW_TYPE_CONTENT:
+                text.setSingleLine(false);
+                actionBarBackgroundDrawable.setAlpha(255);
+                actionBarBackgroundDrawable.invalidateSelf();
+                actionbarTitle.setTextColor(Color.BLACK);
+                name.setTextColor(Color.BLACK);
+                text.setTextColor(Color.BLACK);
+                headLayout.setBackgroundColor(Color.WHITE);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+                    contentLayout.setBackground(repostNameBackgroundDrawable);
+                }else{
+                    contentLayout.setBackgroundDrawable(repostNameBackgroundDrawable);
+                }
+                slidingLayout.expandPane();
+                if(data.hasPic || data.hasRepostPic){
+                    displayImage(0);
+                }else{
+                    slidingLayout.setSlidingEnabled(false);
+                }
                 break;
         }
         ImageLoader.getInstance().displayImage(data.headUrl, head, new DisplayImageOptions.Builder()
@@ -81,17 +107,25 @@ public class DetailActivity extends Activity implements View.OnClickListener{
                 .showImageForEmptyUri(R.drawable.default_head)
                 .cacheInMemory(true)
                 .cacheOnDisc(true)
-                .displayer(new RoundedBitmapDisplayer(FuncInt.dp(30)))
+                .displayer(new RoundedBitmapDisplayer(FuncInt.dp(40)))
                 .build());
         name.setText(data.name);
-        content.setText(data.text);
+        text.setText(data.text);
+        if(data.hasRepost){
+            repostName.setVisibility(View.VISIBLE);
+            repostText.setVisibility(View.VISIBLE);
+            repostName.setText(data.repostName);
+            repostText.setText(data.repostText);
+        }
     }
 
     private void initViews(){
         actionBar = getActionBar();
-        final Drawable actionBarBackgroundDrawable= getResources().getDrawable(R.drawable.ab_solid_light_holo);
+        actionBarBackgroundDrawable = getResources().getDrawable(R.drawable.ab_solid_light_holo);
+        repostNameBackgroundDrawable = getResources().getDrawable(R.drawable.bg_detail_contentlayout);
         if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN){
             actionBarBackgroundDrawable.setCallback(mDrawableCallback);
+            repostNameBackgroundDrawable.setCallback(mDrawableCallback);
         }
         actionBarBackgroundDrawable.setAlpha(0);
         actionBar.setBackgroundDrawable(actionBarBackgroundDrawable);
@@ -100,12 +134,22 @@ public class DetailActivity extends Activity implements View.OnClickListener{
         slidingLayout.setPanelTransparent(true);
         slidingLayout.setCoveredFadeColor(Color.TRANSPARENT);
         slidingLayout.setPanelHeight(FuncInt.dp(82 + 48));
+        slidingLayout.setEnableDragViewTouchEvents(true);
         slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.SimplePanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
                 int alpha = (int) (255 * (1 - slideOffset));
+                if(alpha > 0 && !contentLayout.getBackground().equals(repostNameBackgroundDrawable)){
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+                        contentLayout.setBackground(repostNameBackgroundDrawable);
+                    }else{
+                        contentLayout.setBackgroundDrawable(repostNameBackgroundDrawable);
+                    }
+                }
                 actionBarBackgroundDrawable.setAlpha(alpha);
+                repostNameBackgroundDrawable.setAlpha(alpha);
                 actionBarBackgroundDrawable.invalidateSelf();
+                repostNameBackgroundDrawable.invalidateSelf();
                 int fontColor;
                 int backgroundColor = Color.argb(alpha, 255, 255, 255);
                 if (alpha < 128) {
@@ -115,9 +159,10 @@ public class DetailActivity extends Activity implements View.OnClickListener{
                 }
                 actionbarTitle.setTextColor(fontColor);
                 name.setTextColor(fontColor);
-                content.setTextColor(fontColor);
+                text.setTextColor(fontColor);
+                repostName.setTextColor(fontColor);
+                repostText.setTextColor(fontColor);
                 headLayout.setBackgroundColor(backgroundColor);
-                contentLayout.setBackgroundColor(backgroundColor);
             }
 
             @Override
@@ -125,16 +170,23 @@ public class DetailActivity extends Activity implements View.OnClickListener{
                 if (!actionBar.isShowing()) {
                     actionBar.show();
                 }
+                text.setSingleLine(false);
             }
 
             @Override
             public void onPanelCollapsed(View panel) {
                 headLayout.setBackgroundResource(R.drawable.black_gradient);
+                text.setSingleLine(true);
+                if(slidingLayout.getPanelHeight() == FuncInt.dp(48)){
+                    actionBar.hide();
+                }
             }
         });
         frontLayout = (RelativeLayout) findViewById(R.id.detail_frontlayout);
+        frontLayout.setOnClickListener(this);
         headLayout = (RelativeLayout) findViewById(R.id.detail_frontlayout_head_layout);
-        contentLayout = (RelativeLayout) findViewById(R.id.detail_frontlayout_content_layout);
+//        slidingLayout.setDragView(headLayout);
+        contentLayout = (RelativeLayout)    findViewById(R.id.detail_frontlayout_content_layout);
         viewPager = (HackyViewPager) findViewById(R.id.detail_picpager);
         progress = (ProgressBar) findViewById(R.id.detail_progress);
         int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
@@ -142,7 +194,12 @@ public class DetailActivity extends Activity implements View.OnClickListener{
         actionbarTitle.setTextColor(Color.WHITE);
         head = (ImageView) findViewById(R.id.detail_head);
         name = (TextView) findViewById(R.id.detail_name);
-        content = (TextView) findViewById(R.id.detail_content);
+        text = (TextView) findViewById(R.id.detail_text);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
+        repostName = (TextView) findViewById(R.id.detail_repost_name);
+        repostName.setMovementMethod(LinkMovementMethod.getInstance());
+        repostText = (TextView) findViewById(R.id.detail_repost_text);
+        repostText.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private Drawable.Callback mDrawableCallback = new Drawable.Callback() {
@@ -185,8 +242,10 @@ public class DetailActivity extends Activity implements View.OnClickListener{
                     public void onViewTap(View view, float v, float v2) {
                         if (actionBar.isShowing()) {
                             actionBar.hide();
+                            slidingLayout.setPanelHeight(FuncInt.dp(48));
                         } else {
                             actionBar.show();
+                            slidingLayout.setPanelHeight(FuncInt.dp(82 + 48));
                         }
                     }
                 });
@@ -215,7 +274,13 @@ public class DetailActivity extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-
+            case R.id.detail_frontlayout:
+                if(slidingLayout.isExpanded() && (data.hasPic || data.hasRepostPic)){
+                    slidingLayout.collapsePane();
+                }else{
+                    slidingLayout.expandPane();
+                }
+                break;
         }
     }
 

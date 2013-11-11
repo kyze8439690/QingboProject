@@ -109,6 +109,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     private void appInit(){
         Func.setContext(getApplicationContext());
         FuncNet.setContext(getApplicationContext());
+        FuncInt.setContext(getApplicationContext());
     }
 
     private boolean hasAccount(){
@@ -294,7 +295,10 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                     break;
             }
         }else if(parent.equals(mTimeLineList)){
-
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(DetailActivity.DATA, timeLineData.get(position));
+            intent.putExtra(DetailActivity.VIEW_TYPE, DetailActivity.VIEW_TYPE_CONTENT);
+            startActivity(intent);
         }
     }
 
