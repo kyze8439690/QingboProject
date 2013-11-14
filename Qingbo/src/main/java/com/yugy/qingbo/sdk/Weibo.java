@@ -98,6 +98,7 @@ public class Weibo {
     public static void getNewTimeline(Context context, String firstStatusId, final JsonHttpResponseHandler responseHandler){
         RequestParams params = getParamsWithAccessToken(context);
         params.put("since_id", firstStatusId);
+        params.put("count", "40");
         mClient.get(context, WeiboApiUrl.STATUS_HOME_TIMELINE, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONObject response) {
@@ -122,7 +123,7 @@ public class Weibo {
     public static void getOldTimeline(Context context, String lastStatusId, final JsonHttpResponseHandler responseHandler){
         RequestParams params = getParamsWithAccessToken(context);
         params.put("max_id", lastStatusId);
-        params.put("count", 21 + "");
+        params.put("count", "41");
         mClient.get(context, WeiboApiUrl.STATUS_HOME_TIMELINE, params, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(JSONObject response) {

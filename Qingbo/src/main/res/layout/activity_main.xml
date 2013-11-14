@@ -21,6 +21,7 @@
             android:drawSelectorOnTop="true"
             android:listSelector="@drawable/listitem_selector"
             android:cacheColorHint="#e5e5e5"
+            android:scrollingCache="true"
             android:scrollbarStyle="insideOverlay"
             />
 

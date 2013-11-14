@@ -32,6 +32,7 @@ import com.yugy.qingbo.R;
 import com.yugy.qingbo.func.Func;
 import com.yugy.qingbo.func.FuncInt;
 import com.yugy.qingbo.func.FuncNet;
+import com.yugy.qingbo.helper.SpeedScrollListener;
 import com.yugy.qingbo.model.TimeLineModel;
 import com.yugy.qingbo.sdk.Weibo;
 import com.yugy.qingbo.sql.AccountsDataSource;
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     private ArrayList<TimeLineModel> timeLineData;
     private BaseAdapter timeLineListAdapter;
     private AnimationDrawable mJingleDrawable;
+    private SpeedScrollListener speedScrollListener;
 
     private long firstStatusId = 0;
     private long lastStatusId = 0;
@@ -76,7 +78,6 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        Debug.startMethodTracing();
         MobclickAgent.setDebugMode(true);
         MobclickAgent.onError(this);
         UmengUpdateAgent.update(this);
@@ -90,7 +91,6 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
 
     @Override
     protected void onDestroy() {
-//        Debug.stopMethodTracing();
         super.onDestroy();
     }
 
@@ -136,7 +136,8 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
         ProgressBar progressBar = new ProgressBar(this);
         progressBar.setIndeterminate(true);
         mTimeLineList.addFooterView(progressBar);
-        PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), false, true);
+        speedScrollListener = new SpeedScrollListener();
+        PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true, speedScrollListener);
         mTimeLineList.setOnScrollListener(pauseOnScrollListener);
         mPullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.main_refreshlayout);
 
@@ -199,6 +200,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
             }
 
             private int adapterLastPosition = -1;
+            private static final int DEFAULT_ANIM_SPEED = 800;
 
             @Override
             public long getItemId(int position) {
@@ -215,13 +217,15 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
                 }
                 item.parse(timeLineData.get(position));
                 if (position > adapterLastPosition) {
-                    item.setTranslationX(0.0f);
-                    item.setTranslationY(200);
+                    double speed = speedScrollListener.getSpeed();
+                    long animDuration = ((int) speed == 0) ? DEFAULT_ANIM_SPEED : (long) ( 1 / speed * 15000);
+                    animDuration = animDuration > DEFAULT_ANIM_SPEED ? DEFAULT_ANIM_SPEED : animDuration;
                     item.setRotationX(45.0f);
+                    item.setTranslationY(200);
                     item.setScaleX(0.7f);
                     item.setScaleY(0.55f);
-                    ViewPropertyAnimator localViewPropertyAnimator = item.animate().rotationX(0.0f).rotationY(0.0f)
-                            .translationX(0).translationY(0).setDuration(600)
+                    ViewPropertyAnimator localViewPropertyAnimator = item.animate().rotationX(0.0f)
+                            .translationY(0).setDuration(animDuration)
                             .scaleX(1.0f).scaleY(1.0f).setInterpolator(new DecelerateInterpolator());
                     localViewPropertyAnimator.setStartDelay(0).start();
                     adapterLastPosition = position;

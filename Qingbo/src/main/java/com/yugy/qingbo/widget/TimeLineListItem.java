@@ -40,6 +40,7 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
     private TextView time;
     private NoScrollGridView gridView;
     private SelectorImageView pic;
+    private View line;
     private TextView repostName;
     private TextView repostText;
     private TextView commentCount;
@@ -59,6 +60,7 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
         time = (TextView) findViewById(R.id.timeline_listitem_time);
         gridView = (NoScrollGridView) findViewById(R.id.timeline_listitem_picgrid);
         pic = (SelectorImageView) findViewById(R.id.timeline_listitem_pic);
+        line = findViewById(R.id.timeline_listitem_line);
         repostName = (TextView) findViewById(R.id.timeline_listitem_repost_name);
         repostName.setMovementMethod(LinkMovementMethod.getInstance());
         repostText = (TextView) findViewById(R.id.timeline_listitem_repost_text);
@@ -104,11 +106,13 @@ public class TimeLineListItem extends RelativeLayout implements View.OnClickList
             topic.setText(data.topics.get(0));
         }
         if(data.hasRepost){
+            line.setVisibility(VISIBLE);
             repostName.setVisibility(VISIBLE);
             repostText.setVisibility(VISIBLE);
             repostName.setText(data.repostName);
             repostText.setText(data.repostText);
         }else{
+            line.setVisibility(GONE);
             repostName.setVisibility(GONE);
             repostText.setVisibility(GONE);
         }

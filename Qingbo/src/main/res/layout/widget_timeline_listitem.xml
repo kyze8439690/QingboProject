@@ -59,14 +59,24 @@
         android:visibility="invisible"
         />
 
+    <View
+        android:id="@+id/timeline_listitem_line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#CDCDCD"
+        android:layout_below="@id/timeline_listitem_text"
+        android:layout_marginTop="14dp"
+        android:layout_marginRight="14dp"
+        android:visibility="gone"
+        />
+
     <TextView
         android:id="@+id/timeline_listitem_repost_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/timeline_listitem_text"
+        android:layout_below="@id/timeline_listitem_line"
         android:layout_marginTop="14dp"
         android:layout_marginRight="14dp"
-        android:background="@drawable/bg_repost_name"
         android:visibility="gone"
         />
 
