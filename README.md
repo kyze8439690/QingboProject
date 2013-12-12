@@ -19,3 +19,4 @@ Qingbo is a sina weibo client, with a google plus appearence.Sorry for that I ha
 
 - Can not view long image
 
+![alt tag](https://raw.github.com/kyze8439690/QingboProject/master/screenshots/1.jpg)
